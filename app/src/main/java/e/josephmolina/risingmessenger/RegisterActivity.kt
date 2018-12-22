@@ -18,7 +18,7 @@ import java.util.*
 class RegisterActivity : AppCompatActivity() {
 
     var selectedPhotoUri: Uri? = null
-
+    val CHOOSE_PHOTO_INTENT_REQUEST_CODE = 0;
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
@@ -35,7 +35,7 @@ class RegisterActivity : AppCompatActivity() {
         select_photo_button.setOnClickListener {
             val choosePhotoIntent = Intent(Intent.ACTION_PICK)
             choosePhotoIntent.type = "image/*"
-            startActivityForResult(choosePhotoIntent, 0)
+            startActivityForResult(choosePhotoIntent, CHOOSE_PHOTO_INTENT_REQUEST_CODE)
         }
     }
 
@@ -47,7 +47,7 @@ class RegisterActivity : AppCompatActivity() {
 
             val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, selectedPhotoUri)
             selectphoto_imageview.setImageBitmap(bitmap)
-            select_photo_button.alpha = 0f
+            select_photo_button.alpha = 0f // makes the imageview transparent.
 
 //            val bitmapDrawable = BitmapDrawable(bitmap)
 //            select_photo_button.setBackgroundDrawable(bitmapDrawable)
@@ -96,11 +96,14 @@ class RegisterActivity : AppCompatActivity() {
         Log.d("Register", "inside save user")
         val uid = FirebaseAuth.getInstance().uid ?: ""
         val ref = FirebaseDatabase.getInstance().getReference("/users/$uid")
-        val user = User(uid, username_editText.text.toString(),  profileImageUrl)
+        val user = User(uid, username_editText.text.toString(), profileImageUrl)
 
         ref.setValue(user)
             .addOnSuccessListener {
                 Log.d("Register", "Finally we saved the user to firebase db")
+                val goToLatestMessagesActivityIntent = Intent(this, LatestMessagesActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
+                startActivity(goToLatestMessagesActivityIntent)
             }
             .addOnFailureListener {
                 Toast.makeText(this, "Failed to create user: ${it.message}", Toast.LENGTH_SHORT).show()
