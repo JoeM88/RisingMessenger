@@ -85,9 +85,9 @@ class RegisterActivity : AppCompatActivity() {
         ref.putFile(selectedPhotoUri!!)
             .addOnSuccessListener {
                 Log.d("Register", "Successfully uploaded image: ${it.metadata?.path}")
-                ref.downloadUrl.addOnSuccessListener { it ->
+                ref.downloadUrl.addOnSuccessListener { listener ->
                     Log.d("Register", "File location: $it")
-                    saveUserToFirebaseDatabase(it.toString())
+                    saveUserToFirebaseDatabase(listener.toString())
                 }
             }
     }
@@ -113,4 +113,6 @@ class RegisterActivity : AppCompatActivity() {
     }
 }
 
-class User(val uid: String, val username: String, val profileImageUrl: String)
+class User(val uid: String, val username: String, val profileImageUrl: String) {
+    constructor(): this("","", "")
+}
