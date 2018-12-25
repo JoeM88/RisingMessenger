@@ -1,10 +1,11 @@
-package e.josephmolina.risingmessenger
+package e.josephmolina.risingmessenger.registerlogin
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
+import e.josephmolina.risingmessenger.R
 import kotlinx.android.synthetic.main.activity_login.*
 
 class LoginActivity : AppCompatActivity() {

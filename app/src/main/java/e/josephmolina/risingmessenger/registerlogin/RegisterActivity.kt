@@ -1,8 +1,7 @@
-package e.josephmolina.risingmessenger
+package e.josephmolina.risingmessenger.registerlogin
 
 import android.app.Activity
 import android.content.Intent
-import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
@@ -12,6 +11,9 @@ import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
+import e.josephmolina.risingmessenger.R
+import e.josephmolina.risingmessenger.messages.LatestMessagesActivity
+import e.josephmolina.risingmessenger.models.User
 import kotlinx.android.synthetic.main.activity_register.*
 import java.util.*
 
@@ -96,7 +98,8 @@ class RegisterActivity : AppCompatActivity() {
         Log.d("Register", "inside save user")
         val uid = FirebaseAuth.getInstance().uid ?: ""
         val ref = FirebaseDatabase.getInstance().getReference("/users/$uid")
-        val user = User(uid, username_editText.text.toString(), profileImageUrl)
+        val user =
+            User(uid, username_editText.text.toString(), profileImageUrl)
 
         ref.setValue(user)
             .addOnSuccessListener {
@@ -111,8 +114,4 @@ class RegisterActivity : AppCompatActivity() {
 
             }
     }
-}
-
-class User(val uid: String, val username: String, val profileImageUrl: String) {
-    constructor(): this("","", "")
 }
