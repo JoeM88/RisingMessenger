@@ -18,7 +18,7 @@
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"
             android:layout_marginBottom="16dp"
-            android:id="@+id/textView2"
+            android:id="@+id/textView_from_row"
             android:maxWidth="240dp"
             android:background="@drawable/rounded_edittext_register_login"
             android:padding="16dp"
