@@ -2,7 +2,6 @@ package e.josephmolina.risingmessenger.messages
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.view.View
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
@@ -33,14 +32,17 @@ class ChatLogActivity : AppCompatActivity() {
         toUser = intent.getParcelableExtra<User>(NewMessageActivity.USER_KEY)
         supportActionBar?.title = toUser?.username
 
-        listenForMessages()
+        fetchUserMessages()
         send_button_chat_log.setOnClickListener {
             performSendMessage()
         }
     }
 
-    private fun listenForMessages() {
-        val ref = FirebaseDatabase.getInstance().getReference("/messages")
+    private fun fetchUserMessages() {
+        val senderId = FirebaseAuth.getInstance().uid
+        val senteeId = toUser?.uid
+
+        val ref = FirebaseDatabase.getInstance().getReference("/user-messages/$senderId/$senteeId")
         ref.addChildEventListener(object : ChildEventListener {
 
             override fun onChildAdded(p0: DataSnapshot, p1: String?) {
@@ -76,15 +78,23 @@ class ChatLogActivity : AppCompatActivity() {
     private fun performSendMessage() {
         val user = intent.getParcelableExtra<User>(NewMessageActivity.USER_KEY)
         val text = editText_chat_log.text.toString()
-        val fromId = FirebaseAuth.getInstance().uid
-        val toId = user.uid
+
+        val senderId = FirebaseAuth.getInstance().uid
+        val recipientId = user.uid
         val timestamp = System.currentTimeMillis() / 1000
-        if (fromId == null) return
+        if (senderId == null) return
 
-        val reference = FirebaseDatabase.getInstance().getReference("/messages").push()
+        val reference = FirebaseDatabase.getInstance().getReference("/user-messages/$senderId/$recipientId").push()
+        val toReference = FirebaseDatabase.getInstance().getReference("/user-messages/$recipientId/$senderId").push()
 
-        val chatMessage = ChatMessage(reference.key!!, text, fromId, toId, timestamp)
+        val chatMessage = ChatMessage(reference.key!!, text, senderId, recipientId, timestamp)
         reference.setValue(chatMessage)
+            .addOnSuccessListener {
+                editText_chat_log.text.clear()
+                recyclerview_chat_log.scrollToPosition(adapter.itemCount - 1)
+            }
+
+        toReference.setValue(chatMessage)
     }
 }
 
