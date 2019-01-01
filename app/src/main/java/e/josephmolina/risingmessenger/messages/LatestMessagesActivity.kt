@@ -3,11 +3,13 @@ package e.josephmolina.risingmessenger.messages
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.widget.DividerItemDecoration
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
+import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.Item
 import com.xwray.groupie.ViewHolder
@@ -15,6 +17,7 @@ import e.josephmolina.risingmessenger.R
 import e.josephmolina.risingmessenger.models.ChatMessage
 import e.josephmolina.risingmessenger.models.User
 import e.josephmolina.risingmessenger.registerlogin.RegisterActivity
+import e.josephmolina.risingmessenger.views.LatestMessageRow
 import kotlinx.android.synthetic.main.activity_latest_messages.*
 import kotlinx.android.synthetic.main.latest_message_row.view.*
 
@@ -33,22 +36,27 @@ class LatestMessagesActivity : AppCompatActivity() {
 
 
         recycler_view_latest_messages.adapter = adapter
+        recycler_view_latest_messages.addItemDecoration(
+            DividerItemDecoration(
+                this,
+                DividerItemDecoration.VERTICAL
+            )
+        )
+
+        adapter.setOnItemClickListener { item, view ->
+            val intent = Intent(this, ChatLogActivity::class.java)
+
+            val row = item as LatestMessageRow
+
+            intent.putExtra(NewMessageActivity.USER_KEY, row.chatPartnerUser)
+            startActivity(intent)
+        }
 
         listenForLatestMessages()
         fetchCurrentUser()
         verifyUserIsLoggedIn()
     }
 
-    class LatestMessageRow(val chatMessage: ChatMessage) : Item<ViewHolder>() {
-        override fun getLayout(): Int {
-            return R.layout.latest_message_row
-        }
-
-        override fun bind(viewHolder: ViewHolder, position: Int) {
-            viewHolder.itemView.latest_message_textview.text = chatMessage.text
-        }
-
-    }
 
     private fun listenForLatestMessages() {
         val senderId = FirebaseAuth.getInstance().uid
@@ -60,7 +68,7 @@ class LatestMessagesActivity : AppCompatActivity() {
                 latestMessagesMap[p0.key!!] = chatMessage
                 refreshRecyclerViewMessages()
 
-                    //adapter.add(LatestMessageRow(chatMessage))
+                //adapter.add(LatestMessageRow(chatMessage))
             }
 
             override fun onChildChanged(p0: DataSnapshot, p1: String?) {
